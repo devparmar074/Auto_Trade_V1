@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="AutoTrade.Api/AutoTrade.Api.csproj" />
+  <Project Path="AutoTrade.Application/AutoTrade.Application.csproj" />
+  <Project Path="AutoTrade.Domain/AutoTrade.Domain.csproj" />
+  <Project Path="AutoTrade.Infrastructure/AutoTrade.Infrastructure.csproj" />
+</Solution>

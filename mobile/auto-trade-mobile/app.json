@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "Auto Trade",
+    "slug": "auto-trade-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#090d16"
+    }
+  }
+}
