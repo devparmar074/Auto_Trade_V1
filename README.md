@@ -44,50 +44,47 @@ Auto_Trade_V1/
 
 ---
 
-## Quickstart
+## Quickstart & Setup (Personal Laptop)
 
-### 1. Database Setup (SQL Server)
-Ensure SQL Server (or LocalDB) is running:
+### 1. Prerequisites
+Ensure you have the following installed on your laptop:
+* [.NET 10 SDK](https://dotnet.microsoft.com/download)
+* [Node.js (v18+)](https://nodejs.org/)
+* [SQL Server Express / LocalDB](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/sql-server-express-localdb) (comes standard with Visual Studio or as standalone download)
+
+---
+
+### 2. One-Time Setup
+
+1. **Install Web Frontend Dependencies**:
+   ```powershell
+   cd web/auto-trade-web
+   npm install
+   cd ../..
+   ```
+
+2. **Initialize Database (`AutoTradeDb`)**:
+   Run the automated database setup script from the root:
+   ```powershell
+   .\setup-database.ps1
+   ```
+   *(This starts LocalDB, creates `AutoTradeDb`, all schema tables, preset custom strategies, and stored procedures in seconds).*
+
+---
+
+### 3. Launching Auto Trade (1-Click)
+
+From the project root directory, run:
 ```powershell
-# Start LocalDB instance if not started
-sqllocaldb start MSSQLLocalDB
-
-# Initialize database schema and stored procedures
-sqlcmd -S "(localdb)\MSSQLLocalDB" -E -i "database\Scripts\00_InitDatabase.sql"
+.\start-all.ps1
 ```
+*(Or double-click `run.bat`)*
 
-### 2. Configure Upstox Credentials
-Open `backend/AutoTrade.Api/appsettings.json` and insert your Upstox Developer credentials:
-```json
-{
-  "Upstox": {
-    "ApiKey": "YOUR_UPSTOX_API_KEY",
-    "ApiSecret": "YOUR_UPSTOX_API_SECRET",
-    "RedirectUri": "https://localhost:5001/api/upstox/callback"
-  }
-}
-```
-
-### 3. Run Backend API
-```powershell
-cd backend/AutoTrade.Api
-dotnet run
-```
-Backend API will start at `https://localhost:5001` and `http://localhost:5000`.
-Swagger UI: `http://localhost:5000/swagger`
-
-### 4. Run Web Application
-```powershell
-cd web/auto-trade-web
-npm run dev
-```
-Open your browser at `http://localhost:5173`.
-
-### 5. Run Mobile Application
-```powershell
-cd mobile/auto-trade-mobile
-npm run start
-```
+This script automatically:
+1. Starts LocalDB.
+2. Launches the Backend API at `http://localhost:5000`.
+3. Launches the Frontend Web Dashboard at `http://localhost:5173`.
+4. Opens your browser directly to the Auto Trade workstation.
 
 ---
 
