@@ -13,10 +13,13 @@ BEGIN
         DailyMaxLossAmount DECIMAL(18,4) NOT NULL DEFAULT 500.00,
         MaxOrdersPerDay INT NOT NULL DEFAULT 20,
         IsKillSwitchActive BIT NOT NULL DEFAULT 0,
+        UseDynamicCapitalSizing BIT NOT NULL DEFAULT 1,
+        CapitalAllocationPercent DECIMAL(5,2) NOT NULL DEFAULT 90.00,
+        MaxCapitalPerTrade DECIMAL(18,4) NOT NULL DEFAULT 1000.00,
         CreatedAtUtc DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
         UpdatedAtUtc DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
     );
 
-    INSERT INTO StrategyConfig (Id, BotMode, BuyScoreThreshold, SellScoreThreshold, BaseQuantity, MaxQuantity, StopLossPercent, TakeProfitPercent, TrailingStopPercent, DailyMaxLossAmount, MaxOrdersPerDay, IsKillSwitchActive)
-    VALUES (1, 'Manual', 60.00, -40.00, 1, 10, 2.00, 4.00, 1.00, 500.00, 20, 0);
+    INSERT INTO StrategyConfig (Id, BotMode, BuyScoreThreshold, SellScoreThreshold, BaseQuantity, MaxQuantity, StopLossPercent, TakeProfitPercent, TrailingStopPercent, DailyMaxLossAmount, MaxOrdersPerDay, IsKillSwitchActive, UseDynamicCapitalSizing, CapitalAllocationPercent, MaxCapitalPerTrade)
+    VALUES (1, 'Manual', 60.00, -40.00, 1, 10, 2.00, 4.00, 1.00, 500.00, 20, 0, 1, 90.00, 1000.00);
 END

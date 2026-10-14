@@ -18,6 +18,7 @@ public interface IUpstoxClient
     Task<IEnumerable<TradeFill>> GetOrderTradesAsync(string accessToken, string upstoxOrderId, CancellationToken ct = default);
     Task<PositionDto?> GetVodafoneIdeaPositionAsync(string accessToken, string instrumentKey, CancellationToken ct = default);
     Task<HoldingDto?> GetVodafoneIdeaHoldingAsync(string accessToken, string isin, CancellationToken ct = default);
+    Task<UpstoxFundsDto> GetFundsAsync(string accessToken, CancellationToken ct = default);
     Task<Instrument?> ResolveVodafoneIdeaInstrumentFromMasterAsync(CancellationToken ct = default);
     Task<string?> GetRegisteredIpAsync(string accessToken, CancellationToken ct = default);
     Task<string> SetRegisteredIpAsync(string accessToken, string primaryIp, string? secondaryIp = null, CancellationToken ct = default);

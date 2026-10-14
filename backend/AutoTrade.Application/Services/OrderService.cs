@@ -57,6 +57,38 @@ public class OrderService : IOrderService
             throw new TradingException("Safety validation failure: Auto Trade only supports Vodafone Idea (NSE: IDEA).", "UNAUTHORIZED_INSTRUMENT");
         }
 
+        // Capital Guard: Validate that BUY order value does not exceed available Upstox margin
+        if (request.TransactionType == TransactionType.BUY)
+        {
+            try
+            {
+                var funds = await _upstoxClient.GetFundsAsync(accessToken, ct);
+                if (funds.IsLive && funds.AvailableMargin > 0)
+                {
+                    var quote = await _upstoxClient.GetQuoteAsync(instrument.InstrumentKey, accessToken, ct);
+                    var estimatedPrice = (request.Price.HasValue && request.Price.Value > 0) ? request.Price.Value : quote.Ltp;
+                    if (estimatedPrice > 0)
+                    {
+                        var estimatedTotalCost = request.Quantity * estimatedPrice;
+                        if (estimatedTotalCost > funds.AvailableMargin)
+                        {
+                            _logger.LogWarning("Order rejected: Estimated cost ₹{Cost:F2} exceeds available Upstox margin ₹{Margin:F2}",
+                                estimatedTotalCost, funds.AvailableMargin);
+                            throw new TradingException($"Insufficient Funds: Order value (₹{estimatedTotalCost:F2}) exceeds your available Upstox margin of ₹{funds.AvailableMargin:F2}.", "INSUFFICIENT_FUNDS");
+                        }
+                    }
+                }
+            }
+            catch (TradingException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Pre-trade funds check skipped due to transient broker error: {Msg}", ex.Message);
+            }
+        }
+
         var localOrder = new TradeOrder
         {
             CorrelationId = correlationId,

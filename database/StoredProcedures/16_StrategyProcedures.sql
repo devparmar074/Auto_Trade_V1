@@ -17,7 +17,10 @@ CREATE OR ALTER PROCEDURE sp_SaveStrategyConfig
     @TrailingStopPercent DECIMAL(5,2),
     @DailyMaxLossAmount DECIMAL(18,4),
     @MaxOrdersPerDay INT,
-    @IsKillSwitchActive BIT
+    @IsKillSwitchActive BIT,
+    @UseDynamicCapitalSizing BIT = 1,
+    @CapitalAllocationPercent DECIMAL(5,2) = 90.00,
+    @MaxCapitalPerTrade DECIMAL(18,4) = 1000.00
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -36,13 +39,24 @@ BEGIN
             DailyMaxLossAmount = @DailyMaxLossAmount,
             MaxOrdersPerDay = @MaxOrdersPerDay,
             IsKillSwitchActive = @IsKillSwitchActive,
+            UseDynamicCapitalSizing = @UseDynamicCapitalSizing,
+            CapitalAllocationPercent = @CapitalAllocationPercent,
+            MaxCapitalPerTrade = @MaxCapitalPerTrade,
             UpdatedAtUtc = SYSUTCDATETIME()
         WHERE Id = 1;
     END
     ELSE
     BEGIN
-        INSERT INTO StrategyConfig (Id, BotMode, BuyScoreThreshold, SellScoreThreshold, BaseQuantity, MaxQuantity, StopLossPercent, TakeProfitPercent, TrailingStopPercent, DailyMaxLossAmount, MaxOrdersPerDay, IsKillSwitchActive)
-        VALUES (1, @BotMode, @BuyScoreThreshold, @SellScoreThreshold, @BaseQuantity, @MaxQuantity, @StopLossPercent, @TakeProfitPercent, @TrailingStopPercent, @DailyMaxLossAmount, @MaxOrdersPerDay, @IsKillSwitchActive);
+        INSERT INTO StrategyConfig (
+            Id, BotMode, BuyScoreThreshold, SellScoreThreshold, BaseQuantity, MaxQuantity, 
+            StopLossPercent, TakeProfitPercent, TrailingStopPercent, DailyMaxLossAmount, 
+            MaxOrdersPerDay, IsKillSwitchActive, UseDynamicCapitalSizing, CapitalAllocationPercent, MaxCapitalPerTrade
+        )
+        VALUES (
+            1, @BotMode, @BuyScoreThreshold, @SellScoreThreshold, @BaseQuantity, @MaxQuantity, 
+            @StopLossPercent, @TakeProfitPercent, @TrailingStopPercent, @DailyMaxLossAmount, 
+            @MaxOrdersPerDay, @IsKillSwitchActive, @UseDynamicCapitalSizing, @CapitalAllocationPercent, @MaxCapitalPerTrade
+        );
     END
 
     SELECT TOP 1 * FROM StrategyConfig WHERE Id = 1;

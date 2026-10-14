@@ -45,6 +45,9 @@ public class StrategyRepository : IStrategyRepository
         parameters.Add("@DailyMaxLossAmount", config.DailyMaxLossAmount);
         parameters.Add("@MaxOrdersPerDay", config.MaxOrdersPerDay);
         parameters.Add("@IsKillSwitchActive", config.IsKillSwitchActive);
+        parameters.Add("@UseDynamicCapitalSizing", config.UseDynamicCapitalSizing);
+        parameters.Add("@CapitalAllocationPercent", config.CapitalAllocationPercent);
+        parameters.Add("@MaxCapitalPerTrade", config.MaxCapitalPerTrade);
 
         var row = await db.QueryFirstOrDefaultAsync<dynamic>(
             "dbo.sp_SaveStrategyConfig",
@@ -97,6 +100,8 @@ public class StrategyRepository : IStrategyRepository
         var modeStr = (string)(row.BotMode ?? "Manual");
         Enum.TryParse<BotMode>(modeStr, true, out var mode);
 
+        var dict = (IDictionary<string, object?>)row;
+
         return new BotConfig
         {
             Id = (int)row.Id,
@@ -111,6 +116,9 @@ public class StrategyRepository : IStrategyRepository
             DailyMaxLossAmount = (decimal)row.DailyMaxLossAmount,
             MaxOrdersPerDay = (int)row.MaxOrdersPerDay,
             IsKillSwitchActive = (bool)row.IsKillSwitchActive,
+            UseDynamicCapitalSizing = dict.ContainsKey("UseDynamicCapitalSizing") && dict["UseDynamicCapitalSizing"] != null ? (bool)dict["UseDynamicCapitalSizing"]! : true,
+            CapitalAllocationPercent = dict.ContainsKey("CapitalAllocationPercent") && dict["CapitalAllocationPercent"] != null ? (decimal)dict["CapitalAllocationPercent"]! : 90.00m,
+            MaxCapitalPerTrade = dict.ContainsKey("MaxCapitalPerTrade") && dict["MaxCapitalPerTrade"] != null ? (decimal)dict["MaxCapitalPerTrade"]! : 1000.00m,
             CreatedAtUtc = (DateTime)row.CreatedAtUtc,
             UpdatedAtUtc = (DateTime)row.UpdatedAtUtc
         };

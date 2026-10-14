@@ -17,7 +17,7 @@ public class StrategyEngine : IStrategyEngine
         _logger = logger;
     }
 
-    public StrategyScoreDto Evaluate(IList<Candle> candles, decimal currentLtp, BotConfig config)
+    public StrategyScoreDto Evaluate(IList<Candle> candles, decimal currentLtp, BotConfig config, decimal? availableFunds = null)
     {
         var result = new StrategyScoreDto
         {
@@ -31,7 +31,7 @@ public class StrategyEngine : IStrategyEngine
             result.Recommendation = StrategyRecommendation.Neutral;
             result.RecommendationText = "NEUTRAL";
             result.SignalFactors.Add("Insufficient historical candle data for evaluation.");
-            result.RecommendedQuantity = config.BaseQuantity;
+            result.RecommendedQuantity = CalculateQuantity(0, config, currentLtp, availableFunds);
             return result;
         }
 
@@ -183,7 +183,7 @@ public class StrategyEngine : IStrategyEngine
         }
 
         // Calculate dynamic sizing
-        result.RecommendedQuantity = CalculateQuantity(result.Score, config);
+        result.RecommendedQuantity = CalculateQuantity(result.Score, config, currentLtp, availableFunds);
 
         _logger.LogInformation("Vodafone Idea Strategy evaluated: Score {Score} ({Rec}), Dynamic Qty: {Qty}",
             result.Score, result.RecommendationText, result.RecommendedQuantity);
@@ -193,22 +193,71 @@ public class StrategyEngine : IStrategyEngine
 
     public int CalculateQuantity(decimal score, BotConfig config)
     {
-        var baseQty = Math.Max(1, config.BaseQuantity);
-        var maxQty = Math.Max(baseQty, config.MaxQuantity);
+        return CalculateQuantity(score, config, 0m, null);
+    }
 
-        if (score >= 85m)
+    public int CalculateQuantity(decimal score, BotConfig config, decimal currentLtp, decimal? availableFunds = null)
+    {
+        var baseQty = Math.Max(1, config.BaseQuantity);
+        var maxQty = config.MaxQuantity > 0 ? Math.Max(baseQty, config.MaxQuantity) : int.MaxValue;
+
+        // If dynamic sizing is disabled or no funds provided or LTP is zero, fallback to legacy base sizing
+        if (!config.UseDynamicCapitalSizing || !availableFunds.HasValue || availableFunds.Value <= 0 || currentLtp <= 0)
         {
-            return Math.Min(baseQty * 3, maxQty);
-        }
-        if (score >= 65m)
-        {
-            return Math.Min(baseQty * 2, maxQty);
-        }
-        if (score >= config.BuyScoreThreshold)
-        {
+            if (score >= 85m)
+            {
+                return Math.Min(baseQty * 3, maxQty);
+            }
+            if (score >= 65m)
+            {
+                return Math.Min(baseQty * 2, maxQty);
+            }
+            if (score >= config.BuyScoreThreshold)
+            {
+                return baseQty;
+            }
             return baseQty;
         }
 
-        return baseQty;
+        var margin = availableFunds.Value;
+        // Cap deployable capital by MaxCapitalPerTrade if specified (> 0)
+        var deployableCapital = config.MaxCapitalPerTrade > 0 ? Math.Min(margin, config.MaxCapitalPerTrade) : margin;
+
+        // Apply capital allocation buffer (e.g. 90% or 95% to preserve buffer for STT, taxes, brokerage)
+        var allocationPercent = config.CapitalAllocationPercent > 0 && config.CapitalAllocationPercent <= 100 
+            ? config.CapitalAllocationPercent 
+            : 90.00m;
+
+        var usableCapital = deployableCapital * (allocationPercent / 100m);
+
+        // Calculate maximum affordable shares with allocated capital
+        var calculatedQty = (int)Math.Floor(usableCapital / currentLtp);
+
+        // If score is marginal (e.g. 60-70), scale down slightly to manage entry risk
+        if (score < 70m && score >= config.BuyScoreThreshold)
+        {
+            calculatedQty = Math.Max(1, (int)(calculatedQty * 0.6m));
+        }
+        else if (score < 85m && score >= 70m)
+        {
+            calculatedQty = Math.Max(1, (int)(calculatedQty * 0.8m));
+        }
+
+        // Clamp by MaxQuantity if MaxQuantity is configured (> 0)
+        if (config.MaxQuantity > 0)
+        {
+            calculatedQty = Math.Min(calculatedQty, config.MaxQuantity);
+        }
+
+        // Hard Guarantee: Total order value strictly does not exceed available margin
+        while (calculatedQty > 0 && (calculatedQty * currentLtp) > margin)
+        {
+            calculatedQty--;
+        }
+
+        _logger.LogInformation("Dynamic Capital Sizing: Margin=₹{Funds:F2}, Usable=₹{Usable:F2}, LTP=₹{Ltp:F2}, Score={Score} -> Dynamic Qty: {Qty} shares (Cost: ₹{Cost:F2})",
+            margin, usableCapital, currentLtp, score, calculatedQty, calculatedQty * currentLtp);
+
+        return calculatedQty;
     }
 }

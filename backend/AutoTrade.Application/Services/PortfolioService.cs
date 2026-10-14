@@ -68,4 +68,25 @@ public class PortfolioService : IPortfolioService
         var instrument = await _instrumentService.GetVodafoneIdeaInstrumentAsync(ct);
         return await _upstoxClient.GetVodafoneIdeaHoldingAsync(token, instrument.Isin, ct);
     }
+
+    public async Task<UpstoxFundsDto> GetFundsAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            var token = await _authService.GetActiveAccessTokenAsync(ct);
+            return await _upstoxClient.GetFundsAsync(token, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to retrieve Upstox funds. Returning zero funds state.");
+            return new UpstoxFundsDto
+            {
+                AvailableMargin = 0m,
+                UsedMargin = 0m,
+                IsLive = false,
+                StatusMessage = $"Authentication or API Error: {ex.Message}",
+                RetrievedAtUtc = DateTime.UtcNow
+            };
+        }
+    }
 }

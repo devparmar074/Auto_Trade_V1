@@ -4,7 +4,8 @@ import type {
   OrderResult, 
   PlaceOrderRequest, 
   Position, 
-  UpstoxAuthStatus 
+  UpstoxAuthStatus,
+  UpstoxFunds
 } from '../types/trading';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '';
@@ -30,6 +31,12 @@ export async function fetchMarketStatus(): Promise<{ status: string }> {
 export async function fetchPosition(): Promise<Position> {
   const res = await fetch(`${BASE_URL}/api/vi/position`);
   if (!res.ok) throw new Error('Failed to fetch position');
+  return res.json();
+}
+
+export async function fetchFunds(): Promise<UpstoxFunds> {
+  const res = await fetch(`${BASE_URL}/api/vi/funds`);
+  if (!res.ok) throw new Error('Failed to fetch Upstox funds');
   return res.json();
 }
 

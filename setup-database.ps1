@@ -12,5 +12,6 @@ Write-Host "`n[3/3] Initializing CustomStrategy tables & procedures..." -Foregro
 sqlcmd -S "(localdb)\MSSQLLocalDB" -E -d AutoTradeDb -i "$PSScriptRoot\database\Tables\08_CustomStrategy.sql"
 sqlcmd -S "(localdb)\MSSQLLocalDB" -E -d AutoTradeDb -i "$PSScriptRoot\database\StoredProcedures\16_StrategyProcedures.sql"
 sqlcmd -S "(localdb)\MSSQLLocalDB" -E -d AutoTradeDb -i "$PSScriptRoot\database\StoredProcedures\17_CustomStrategyProcedures.sql"
+sqlcmd -S "(localdb)\MSSQLLocalDB" -E -d AutoTradeDb -i "$PSScriptRoot\database\Scripts\01_AddDynamicCapitalSizing.sql"
 
 Write-Host "`nDatabase setup complete! AutoTradeDb is ready for live trading." -ForegroundColor Green

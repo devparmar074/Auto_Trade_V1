@@ -16,6 +16,9 @@ public class BotConfig
     public decimal DailyMaxLossAmount { get; set; } = 500.00m;
     public int MaxOrdersPerDay { get; set; } = 20;
     public bool IsKillSwitchActive { get; set; } = false;
+    public bool UseDynamicCapitalSizing { get; set; } = true;
+    public decimal CapitalAllocationPercent { get; set; } = 90.00m;
+    public decimal MaxCapitalPerTrade { get; set; } = 1000.00m;
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAtUtc { get; set; } = DateTime.UtcNow;
 }

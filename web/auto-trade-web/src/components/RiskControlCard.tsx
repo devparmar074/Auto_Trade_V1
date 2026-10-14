@@ -8,7 +8,8 @@ import {
   AlertTriangle, 
   Cpu, 
   UserCheck, 
-  BellRing
+  BellRing,
+  Wallet
 } from 'lucide-react';
 
 interface RiskControlCardProps {
@@ -232,9 +233,56 @@ export const RiskControlCard: React.FC<RiskControlCardProps> = ({
             </div>
           </div>
 
-          {/* Base Order Qty */}
+          {/* Capital Allocation Buffer % */}
           <div className="bg-slate-950/60 border border-slate-800 rounded-lg p-2.5">
-            <span className="text-[11px] font-mono text-slate-400 block mb-1">Base Qty</span>
+            <span className="text-[11px] font-mono text-slate-400 block mb-1">Fund Allocation (%)</span>
+            <div className="flex items-center">
+              <input
+                type="number"
+                step="5"
+                min="10"
+                max="100"
+                value={formData.capitalAllocationPercent ?? 90}
+                onChange={(e) => setFormData({ ...formData, capitalAllocationPercent: parseFloat(e.target.value) || 90 })}
+                className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm font-mono text-white focus:outline-none focus:border-indigo-500"
+              />
+              <span className="text-xs font-mono text-slate-400 ml-1.5">%</span>
+            </div>
+          </div>
+
+          {/* Max Capital Per Trade */}
+          <div className="bg-slate-950/60 border border-slate-800 rounded-lg p-2.5">
+            <span className="text-[11px] font-mono text-slate-400 block mb-1">Max Capital / Trade</span>
+            <div className="flex items-center">
+              <span className="text-xs font-mono text-slate-400 mr-1">₹</span>
+              <input
+                type="number"
+                step="100"
+                min="0"
+                max="50000"
+                value={formData.maxCapitalPerTrade ?? 1000}
+                onChange={(e) => setFormData({ ...formData, maxCapitalPerTrade: parseFloat(e.target.value) || 0 })}
+                className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm font-mono text-white focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+          </div>
+
+          {/* Max Shares Limit */}
+          <div className="bg-slate-950/60 border border-slate-800 rounded-lg p-2.5">
+            <span className="text-[11px] font-mono text-slate-400 block mb-1">Max Shares Cap</span>
+            <input
+              type="number"
+              min="1"
+              max="1000"
+              value={formData.maxQuantity ?? 10}
+              onChange={(e) => setFormData({ ...formData, maxQuantity: parseInt(e.target.value) || 10 })}
+              className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm font-mono text-white focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+
+          {/* Base Order Qty (Fallback) */}
+          <div className="bg-slate-950/60 border border-slate-800 rounded-lg p-2.5">
+            <span className="text-[11px] font-mono text-slate-400 block mb-1">Base Qty (Fallback)</span>
             <input
               type="number"
               min="1"
@@ -257,6 +305,30 @@ export const RiskControlCard: React.FC<RiskControlCardProps> = ({
               className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm font-mono text-white focus:outline-none focus:border-indigo-500"
             />
           </div>
+        </div>
+
+        {/* Dynamic Capital Sizing Toggle Banner */}
+        <div className="mb-4 p-3 bg-slate-950/80 border border-indigo-500/20 rounded-xl flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className={`p-2 rounded-lg ${formData.useDynamicCapitalSizing ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-800 text-slate-500'}`}>
+              <Wallet className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-xs font-bold text-white block">Auto Dynamic Capital Sizing</span>
+              <span className="text-[11px] text-slate-400 font-mono">Automatically sizes order quantities to never exceed available Upstox margin</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, useDynamicCapitalSizing: !formData.useDynamicCapitalSizing })}
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
+              formData.useDynamicCapitalSizing 
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' 
+                : 'bg-slate-800 text-slate-400 hover:text-white'
+            }`}
+          >
+            {formData.useDynamicCapitalSizing ? 'ENABLED' : 'DISABLED'}
+          </button>
         </div>
 
         {/* Feedback message */}

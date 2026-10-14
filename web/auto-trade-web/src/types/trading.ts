@@ -128,6 +128,19 @@ export interface CandleData {
   openInterest: number;
 }
 
+export interface UpstoxFunds {
+  availableMargin: number;
+  usedMargin: number;
+  payinAmount: number;
+  spanMargin: number;
+  adhocMargin: number;
+  notionalCash: number;
+  exposureMargin: number;
+  isLive: boolean;
+  statusMessage?: string;
+  retrievedAtUtc: string;
+}
+
 export interface BotConfig {
   id: number;
   botMode: BotMode;
@@ -141,6 +154,9 @@ export interface BotConfig {
   dailyMaxLossAmount: number;
   maxOrdersPerDay: number;
   isKillSwitchActive: boolean;
+  useDynamicCapitalSizing: boolean;
+  capitalAllocationPercent: number;
+  maxCapitalPerTrade: number;
   createdAtUtc?: string;
   updatedAtUtc?: string;
 }

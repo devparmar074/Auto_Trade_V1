@@ -26,7 +26,9 @@ import { useTradingHub } from './hooks/useTradingHub';
 import { OrderConfirmationModal } from './components/OrderConfirmationModal';
 import { TradingViewChart } from './components/TradingViewChart';
 import { StrategyScoreCard } from './components/StrategyScoreCard';
+import { FundsCard } from './components/FundsCard';
 import { RiskControlCard } from './components/RiskControlCard';
+import type { UpstoxFunds } from './types/trading';
 import { SemiAutoAlertModal } from './components/SemiAutoAlertModal';
 import { ActiveStrategySelectorBanner } from './components/ActiveStrategySelectorBanner';
 import { CustomStrategyScoreCard } from './components/CustomStrategyScoreCard';
@@ -68,6 +70,7 @@ export const App: React.FC = () => {
   const [customStrategyEvaluation, setCustomStrategyEvaluation] = useState<CustomStrategyEvaluationResult | null>(null);
   const [isDeactivatingStrategy, setIsDeactivatingStrategy] = useState<boolean>(false);
   const [botConfig, setBotConfig] = useState<BotConfig | undefined>(undefined);
+  const [liveFunds, setLiveFunds] = useState<UpstoxFunds | null>(null);
   const [activeRiskAlert, setActiveRiskAlert] = useState<RiskAlert | null>(null);
   const [isSemiAutoModalOpen, setIsSemiAutoModalOpen] = useState(false);
   const [isExecutingAlert, setIsExecutingAlert] = useState(false);
@@ -639,7 +642,26 @@ export const App: React.FC = () => {
                 </h3>
 
                 <div className="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-xl p-3 mb-4">
-                  <span className="text-xs font-mono text-slate-300 font-semibold">Order Quantity:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono text-slate-300 font-semibold">Order Quantity:</span>
+                    {liveFunds && liveFunds.availableMargin > 0 && quote && quote.ltp > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const alloc = (botConfig?.capitalAllocationPercent ?? 90) / 100;
+                          const maxCap = botConfig?.maxCapitalPerTrade ?? 1000;
+                          const usable = (maxCap > 0 ? Math.min(liveFunds.availableMargin, maxCap) : liveFunds.availableMargin) * alloc;
+                          const affordQty = Math.max(1, Math.floor(usable / quote.ltp));
+                          const capped = botConfig?.maxQuantity ? Math.min(affordQty, botConfig.maxQuantity) : affordQty;
+                          setQuantity(capped);
+                        }}
+                        className="text-[10px] font-mono px-2 py-0.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded transition-colors"
+                        title={`Max affordable shares based on ₹${liveFunds.availableMargin.toFixed(0)} margin`}
+                      >
+                        Max Afford (₹{liveFunds.availableMargin.toFixed(0)})
+                      </button>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2">
                     <button 
                       type="button" 
@@ -753,6 +775,13 @@ export const App: React.FC = () => {
               ) : (
                 <StrategyScoreCard score={strategyScore} />
               )}
+
+              {/* Upstox Funds, Real-Time Margin & Dynamic Money Sizing Preview */}
+              <FundsCard 
+                quote={quote} 
+                config={botConfig} 
+                onFundsUpdated={(f) => setLiveFunds(f)}
+              />
 
               {/* Option C & D: Risk Management, Trailing SL & Bot Mode Controller */}
               <RiskControlCard 

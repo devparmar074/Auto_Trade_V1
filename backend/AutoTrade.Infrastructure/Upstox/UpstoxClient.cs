@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO.Compression;
 using System.Net.Http.Headers;
 using System.Text;
@@ -550,6 +551,85 @@ public class UpstoxClient : IUpstoxClient
         }
 
         return null;
+    }
+
+    public async Task<UpstoxFundsDto> GetFundsAsync(string accessToken, CancellationToken ct = default)
+    {
+        var url = $"{_config.BaseUrl}/user/get-funds-and-margin?segment=SEC";
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        var response = await _httpClient.SendAsync(request, ct);
+        if (!response.IsSuccessStatusCode)
+        {
+            var err = await response.Content.ReadAsStringAsync(ct);
+            _logger.LogWarning("Upstox get-funds-and-margin returned HTTP {Status}: {Error}", response.StatusCode, err);
+            return new UpstoxFundsDto
+            {
+                AvailableMargin = 0m,
+                UsedMargin = 0m,
+                IsLive = false,
+                StatusMessage = $"Upstox Funds API returned HTTP {response.StatusCode}",
+                RetrievedAtUtc = DateTime.UtcNow
+            };
+        }
+
+        var json = await response.Content.ReadAsStringAsync(ct);
+        using var doc = JsonDocument.Parse(json);
+
+        if (!doc.RootElement.TryGetProperty("data", out var data))
+        {
+            return new UpstoxFundsDto
+            {
+                AvailableMargin = 0m,
+                UsedMargin = 0m,
+                IsLive = false,
+                StatusMessage = "No funds data returned in response",
+                RetrievedAtUtc = DateTime.UtcNow
+            };
+        }
+
+        var target = data;
+        if (data.TryGetProperty("equity", out var eq) && eq.ValueKind == JsonValueKind.Object)
+        {
+            target = eq;
+        }
+
+        decimal ParseDec(JsonElement el, string propName)
+        {
+            if (el.TryGetProperty(propName, out var p))
+            {
+                if (p.ValueKind == JsonValueKind.Number) return p.GetDecimal();
+                if (p.ValueKind == JsonValueKind.String && decimal.TryParse(p.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var d)) return d;
+            }
+            return 0m;
+        }
+
+        var available = ParseDec(target, "available_margin");
+        var used = ParseDec(target, "used_margin");
+        var payin = ParseDec(target, "payin_amount");
+        var span = ParseDec(target, "span_margin");
+        var adhoc = ParseDec(target, "adhoc_margin");
+        var notional = ParseDec(target, "notional_cash");
+        var exposure = ParseDec(target, "exposure_margin");
+
+        _logger.LogInformation("Retrieved Upstox Funds: Available=₹{Avail:F2}, Used=₹{Used:F2}, Payin=₹{Payin:F2}",
+            available, used, payin);
+
+        return new UpstoxFundsDto
+        {
+            AvailableMargin = available,
+            UsedMargin = used,
+            PayinAmount = payin,
+            SpanMargin = span,
+            AdhocMargin = adhoc,
+            NotionalCash = notional,
+            ExposureMargin = exposure,
+            IsLive = true,
+            StatusMessage = "Live Upstox funds synced",
+            RetrievedAtUtc = DateTime.UtcNow
+        };
     }
 
     public async Task<Instrument?> ResolveVodafoneIdeaInstrumentFromMasterAsync(CancellationToken ct = default)

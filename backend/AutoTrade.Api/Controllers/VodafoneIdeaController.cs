@@ -57,6 +57,13 @@ public class VodafoneIdeaController : ControllerBase
         return Ok(holding);
     }
 
+    [HttpGet("funds")]
+    public async Task<ActionResult<UpstoxFundsDto>> GetFunds()
+    {
+        var funds = await _portfolioService.GetFundsAsync();
+        return Ok(funds);
+    }
+
     [HttpGet("instrument")]
     public async Task<ActionResult<Instrument>> GetInstrument()
     {

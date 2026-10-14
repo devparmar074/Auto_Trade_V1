@@ -154,7 +154,17 @@ public class StrategyService : IStrategyService
                 candles = await _upstoxClient.GetHistoricalCandlesAsync(instrument.InstrumentKey, "1minute", toDate, fromDate, ct);
             }
 
-            var score = _strategyEngine.Evaluate(candles, currentLtp, config);
+            UpstoxFundsDto? funds = null;
+            try
+            {
+                funds = await _portfolioService.GetFundsAsync(ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Could not retrieve live funds during strategy evaluation.");
+            }
+
+            var score = _strategyEngine.Evaluate(candles, currentLtp, config, funds?.AvailableMargin);
             _cachedScore = score;
             _lastEvaluatedUtc = DateTime.UtcNow;
 
@@ -232,19 +242,28 @@ public class StrategyService : IStrategyService
                     if (!isCircuitTripped)
                     {
                         var buyQty = score.RecommendedQuantity;
-                        _logger.LogInformation("BOT AUTO-BUY TRIGGERED: Score {Score} >= {Thresh}. Buying {Qty} shares",
-                            score.Score, config.BuyScoreThreshold, buyQty);
-
-                        await _orderService.ExecuteOrderAsync(new PlaceOrderRequest
+                        if (buyQty <= 0)
                         {
-                            TransactionType = TransactionType.BUY,
-                            OrderType = OrderType.MARKET,
-                            Quantity = buyQty,
-                            Product = "D",
-                            CorrelationId = $"BOT_BUY_{DateTime.UtcNow.Ticks}"
-                        }, ct);
+                            _logger.LogWarning("BOT BUY SKIPPED: Calculated quantity is 0 (Insufficient funds for stock price ₹{Ltp:F2} or allocation limit reached). Available Margin: ₹{Avail:F2}",
+                                currentLtp, funds?.AvailableMargin ?? 0m);
+                            signal.ActionTaken = "SKIPPED_INSUFFICIENT_FUNDS";
+                        }
+                        else
+                        {
+                            _logger.LogInformation("BOT AUTO-BUY TRIGGERED: Score {Score} >= {Thresh}. Buying {Qty} shares (Est cost: ₹{Cost:F2}, Available Margin: ₹{Avail:F2})",
+                                score.Score, config.BuyScoreThreshold, buyQty, buyQty * currentLtp, funds?.AvailableMargin ?? 0m);
 
-                        signal.ActionTaken = "AUTO_BUY";
+                            await _orderService.ExecuteOrderAsync(new PlaceOrderRequest
+                            {
+                                TransactionType = TransactionType.BUY,
+                                OrderType = OrderType.MARKET,
+                                Quantity = buyQty,
+                                Product = "D",
+                                CorrelationId = $"BOT_BUY_{DateTime.UtcNow.Ticks}"
+                            }, ct);
+
+                            signal.ActionTaken = "AUTO_BUY";
+                        }
                     }
                     else
                     {
