@@ -76,22 +76,24 @@ export const RiskControlCard: React.FC<RiskControlCardProps> = ({
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col justify-between">
+    <div className={`ob-panel rounded-2xl p-5 shadow-2xl flex flex-col justify-between border transition-all duration-500 relative overflow-hidden ${
+      formData.isKillSwitchActive ? 'border-red-500/60 shadow-[0_0_25px_rgba(255,77,103,0.3)]' : 'border-slate-800'
+    }`}>
       <div>
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-rose-500/10 text-rose-400 rounded-lg">
+        <div className="flex items-center justify-between pb-3.5 border-b border-slate-800/80">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl shadow-[0_0_15px_rgba(255,77,103,0.15)]">
               <ShieldAlert className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-white text-base">Risk Management & Bot Mode</h3>
-              <p className="text-xs text-slate-400 font-mono">Autonomous Execution & Circuit Breakers</p>
+              <h3 className="font-bold text-white text-base tracking-wide">Risk Management & Bot Mode</h3>
+              <p className="text-xs text-slate-400 font-mono mt-0.5">Autonomous Execution & Circuit Breakers</p>
             </div>
           </div>
 
           {formData.isKillSwitchActive && (
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-red-500/20 border border-red-500/40 text-red-400 rounded-full text-xs font-bold font-mono animate-pulse">
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-red-500/20 border border-red-500/50 text-red-400 rounded-full text-xs font-bold font-mono ob-ping-badge shadow-[0_0_15px_rgba(255,77,103,0.4)]">
               <Power className="w-3.5 h-3.5" />
               <span>KILL SWITCH ACTIVE</span>
             </div>
@@ -100,23 +102,24 @@ export const RiskControlCard: React.FC<RiskControlCardProps> = ({
 
         {/* Bot Operational Mode Selection */}
         <div className="my-4">
-          <label className="text-xs font-mono text-slate-400 block mb-2 font-semibold">
-            Execution Mode
+          <label className="text-xs font-mono text-slate-400 block mb-2 font-semibold uppercase tracking-wider flex items-center justify-between">
+            <span>Execution Mode Architecture</span>
+            <span className="text-[10px] text-cyan-400 font-normal">Active: {formData.botMode}</span>
           </label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2.5">
             {/* Manual */}
             <button
               type="button"
               onClick={() => handleModeChange('Manual')}
-              className={`p-3 rounded-lg border text-left flex flex-col transition-all ${
+              className={`p-3 rounded-xl border text-left flex flex-col transition-all duration-300 relative overflow-hidden ${
                 formData.botMode === 'Manual'
-                  ? 'bg-slate-800 border-indigo-500 text-white shadow-md'
-                  : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                  ? 'bg-slate-800/90 border-cyan-500/60 text-white shadow-[0_0_15px_rgba(69,184,255,0.25)]'
+                  : 'bg-[#0b1017] border-slate-800/80 text-slate-400 hover:border-slate-700 hover:text-slate-300'
               }`}
             >
               <div className="flex items-center gap-1.5 font-bold text-xs mb-1">
-                <UserCheck className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Manual</span>
+                <UserCheck className={`w-3.5 h-3.5 ${formData.botMode === 'Manual' ? 'text-cyan-400' : 'text-slate-500'}`} />
+                <span className={formData.botMode === 'Manual' ? 'text-cyan-300' : ''}>Manual</span>
               </div>
               <span className="text-[10px] text-slate-400 leading-tight">
                 Signals only. You execute all trades.
@@ -127,15 +130,15 @@ export const RiskControlCard: React.FC<RiskControlCardProps> = ({
             <button
               type="button"
               onClick={() => handleModeChange('SemiAuto')}
-              className={`p-3 rounded-lg border text-left flex flex-col transition-all ${
+              className={`p-3 rounded-xl border text-left flex flex-col transition-all duration-300 relative overflow-hidden ${
                 formData.botMode === 'SemiAuto'
-                  ? 'bg-amber-950/30 border-amber-500 text-white shadow-md'
-                  : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                  ? 'bg-amber-950/40 border-amber-500/60 text-white shadow-[0_0_15px_rgba(255,176,32,0.25)]'
+                  : 'bg-[#0b1017] border-slate-800/80 text-slate-400 hover:border-slate-700 hover:text-slate-300'
               }`}
             >
-              <div className="flex items-center gap-1.5 font-bold text-xs mb-1 text-amber-400">
-                <BellRing className="w-3.5 h-3.5" />
-                <span>Semi-Auto</span>
+              <div className="flex items-center gap-1.5 font-bold text-xs mb-1">
+                <BellRing className={`w-3.5 h-3.5 ${formData.botMode === 'SemiAuto' ? 'text-amber-400' : 'text-slate-500'}`} />
+                <span className={formData.botMode === 'SemiAuto' ? 'text-amber-300' : ''}>Semi-Auto</span>
               </div>
               <span className="text-[10px] text-slate-400 leading-tight">
                 1-Click popups on high-conviction signals.
@@ -146,15 +149,15 @@ export const RiskControlCard: React.FC<RiskControlCardProps> = ({
             <button
               type="button"
               onClick={() => handleModeChange('FullyAutomated')}
-              className={`p-3 rounded-lg border text-left flex flex-col transition-all ${
+              className={`p-3 rounded-xl border text-left flex flex-col transition-all duration-300 relative overflow-hidden ${
                 formData.botMode === 'FullyAutomated'
-                  ? 'bg-emerald-950/30 border-emerald-500 text-white shadow-md'
-                  : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                  ? 'bg-emerald-950/40 border-emerald-500/60 text-white shadow-[0_0_15px_rgba(25,229,140,0.25)]'
+                  : 'bg-[#0b1017] border-slate-800/80 text-slate-400 hover:border-slate-700 hover:text-slate-300'
               }`}
             >
-              <div className="flex items-center gap-1.5 font-bold text-xs mb-1 text-emerald-400">
-                <Cpu className="w-3.5 h-3.5" />
-                <span>Autonomous</span>
+              <div className="flex items-center gap-1.5 font-bold text-xs mb-1">
+                <Cpu className={`w-3.5 h-3.5 ${formData.botMode === 'FullyAutomated' ? 'text-emerald-400' : 'text-slate-500'}`} />
+                <span className={formData.botMode === 'FullyAutomated' ? 'text-emerald-300' : ''}>Autonomous</span>
               </div>
               <span className="text-[10px] text-slate-400 leading-tight">
                 Hands-free execution within strict SL/TP bounds.

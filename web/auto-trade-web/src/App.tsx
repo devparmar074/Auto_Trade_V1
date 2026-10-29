@@ -355,39 +355,42 @@ export const App: React.FC = () => {
   const isPriceUp = priceChange >= 0;
 
   return (
-    <div className="bg-[#090d16] min-h-screen text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-black">
-      {/* Top Navbar */}
-      <header className="bg-slate-900 border-b border-slate-800 px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40">
+    <div className="bg-[#06080C] min-h-screen text-slate-100 flex flex-col font-sans selection:bg-[#19E58C] selection:text-black ob-grid-bg relative">
+      {/* Top Navbar with Radar Scanner Bottom Border */}
+      <header className="bg-[#090d15]/95 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 relative overflow-hidden">
+        {/* Radar Scanner Line on header bottom */}
+        <div className="ob-scanner-beam h-[2px] bottom-0 top-auto opacity-75" />
+
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
-            <Sparkles className="w-5 h-5" />
+          <div className="p-2.5 bg-gradient-to-br from-emerald-500/20 to-teal-500/10 text-emerald-400 rounded-xl border border-emerald-500/30 shadow-[0_0_15px_rgba(25,229,140,0.2)]">
+            <Sparkles className="w-5 h-5 text-[#19E58C] animate-pulse" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-black tracking-tight text-white m-0">AUTO TRADE</h1>
-              <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <h1 className="text-lg font-black tracking-wider text-white m-0">AUTO TRADE</h1>
+              <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 tracking-widest shadow-[0_0_10px_rgba(25,229,140,0.2)]">
                 PRO V1
               </span>
             </div>
-            <div className="text-xs text-slate-400 font-mono flex items-center gap-2">
-              <span>NSE: IDEA</span>
-              <span>&bull;</span>
-              <span className="flex items-center gap-1">
-                <span className={`w-1.5 h-1.5 rounded-full ${isHubConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
-                {isHubConnected ? 'WebSocket Live' : 'Connecting Feed...'}
+            <div className="text-xs text-slate-400 font-mono flex items-center gap-2 mt-0.5">
+              <span className="font-bold text-slate-300">NSE: IDEA</span>
+              <span className="text-slate-600">&bull;</span>
+              <span className="flex items-center gap-1.5 text-slate-300">
+                <span className={`w-2 h-2 rounded-full ${isHubConnected ? 'bg-emerald-400 ob-sonar-dot' : 'bg-amber-400'}`}></span>
+                <span>{isHubConnected ? 'SignalR Telemetry Live' : 'Connecting Feed...'}</span>
               </span>
             </div>
           </div>
         </div>
 
         {/* Center Navigation Tabs */}
-        <nav className="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+        <nav className="flex items-center gap-1 bg-[#0b1018] p-1.5 rounded-xl border border-slate-800/80 shadow-inner">
           <button
             type="button"
             onClick={() => setActiveTab('terminal')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
+            className={`px-4 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
               activeTab === 'terminal'
-                ? 'bg-slate-800 text-white shadow-sm'
+                ? 'bg-slate-800 text-white shadow-md border border-slate-700/80'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -396,16 +399,16 @@ export const App: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('strategy_customizer')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
               activeTab === 'strategy_customizer'
-                ? 'bg-indigo-600 text-white shadow-sm'
+                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-[0_0_15px_rgba(69,184,255,0.3)]'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             <Sliders className="w-3.5 h-3.5" />
             <span>Strategy Customizer</span>
             {activeStrategyInfo?.activeStrategyType === 'CUSTOM' && (
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-emerald-400 ob-sonar-dot" />
             )}
           </button>
         </nav>
@@ -413,12 +416,12 @@ export const App: React.FC = () => {
         {/* Action Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Connection Status Tag */}
-          <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold border ${
+          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-mono font-semibold border transition-all ${
             authStatus.isConnected 
-              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' 
-              : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+              ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/40 shadow-[0_0_12px_rgba(25,229,140,0.15)]' 
+              : 'bg-rose-500/10 text-rose-300 border-rose-500/40 shadow-[0_0_12px_rgba(255,77,103,0.15)]'
           }`}>
-            <span className={`w-2 h-2 rounded-full ${authStatus.isConnected ? 'bg-emerald-400' : 'bg-rose-500'}`} />
+            <span className={`w-2 h-2 rounded-full ${authStatus.isConnected ? 'bg-emerald-400 ob-sonar-dot' : 'bg-rose-500'}`} />
             <span>Upstox: {authStatus.isConnected ? 'Connected' : 'Disconnected'}</span>
             {authStatus.userName && <span className="text-slate-300">({authStatus.userName})</span>}
           </div>
@@ -426,7 +429,7 @@ export const App: React.FC = () => {
           <button 
             type="button" 
             onClick={handleOpenIpModal} 
-            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-mono font-semibold transition-colors"
+            className="px-3 py-1.5 bg-[#0e1420] hover:bg-slate-800 text-slate-300 border border-slate-700/80 rounded-xl text-xs font-mono font-semibold transition-all active:scale-95"
           >
             Static IP
           </button>
@@ -434,7 +437,7 @@ export const App: React.FC = () => {
           <button 
             type="button" 
             onClick={() => setIsTokenModalOpen(true)} 
-            className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-mono font-semibold transition-colors shadow-sm"
+            className="px-3.5 py-1.5 bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-500 hover:to-cyan-500 text-white rounded-xl text-xs font-mono font-bold transition-all shadow-md active:scale-95 shadow-cyan-950/40"
           >
             Paste Token
           </button>
@@ -443,14 +446,14 @@ export const App: React.FC = () => {
             <button 
               type="button" 
               onClick={handleDisconnect} 
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg text-xs font-mono transition-colors"
+              className="px-3 py-1.5 bg-slate-850 hover:bg-slate-800 text-slate-400 rounded-xl text-xs font-mono transition-colors active:scale-95 border border-slate-800"
             >
               Disconnect
             </button>
           ) : (
             <a 
               href={getConnectUrl()} 
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 border border-slate-700 rounded-lg text-xs font-mono transition-colors no-underline"
+              className="px-3 py-1.5 bg-[#0e1420] hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-xl text-xs font-mono transition-colors no-underline"
             >
               OAuth Login
             </a>
@@ -508,67 +511,67 @@ export const App: React.FC = () => {
             isDeactivating={isDeactivatingStrategy}
           />
 
-          {/* Top Summary Banner: IDEA Quick Stats */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
-            <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          {/* Top Summary Banner: IDEA Quick Stats with OrderBlock aesthetics */}
+          <div className="ob-panel rounded-2xl p-5 shadow-2xl border border-slate-800 relative overflow-hidden">
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
               <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-extrabold text-white">VODAFONE IDEA LIMITED</h2>
-                  <span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">NSE EQ</span>
-                  <span className="text-xs font-mono text-emerald-400">INE669E01016</span>
+                <div className="flex items-center gap-2.5">
+                  <h2 className="text-xl font-black text-white tracking-wide">VODAFONE IDEA LIMITED</h2>
+                  <span className="text-[11px] px-2 py-0.5 rounded-md bg-slate-800/90 text-cyan-400 font-mono border border-slate-700/80 font-bold">NSE EQ</span>
+                  <span className="text-xs font-mono text-emerald-400 font-bold">INE669E01016</span>
                 </div>
-                <p className="text-xs text-slate-400 font-mono">Telecom Services &bull; Primary Active Instrument</p>
+                <p className="text-xs text-slate-400 font-mono mt-0.5">Telecom Services &bull; Primary Active Instrument</p>
               </div>
 
-              <div className={`px-3 py-1 rounded-full text-xs font-mono font-bold border flex items-center gap-2 ${
-                isMarketOpen ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-slate-800 text-slate-400 border-slate-700'
+              <div className={`px-3 py-1 rounded-full text-xs font-mono font-bold border flex items-center gap-2 transition-all ${
+                isMarketOpen ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_12px_rgba(25,229,140,0.15)]' : 'bg-slate-800/80 text-slate-400 border-slate-700'
               }`}>
-                {isMarketOpen && <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>}
+                {isMarketOpen && <span className="w-2 h-2 rounded-full bg-emerald-400 ob-sonar-dot"></span>}
                 MARKET: {marketStatus}
               </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-              {/* LTP */}
+              {/* LTP with Tick Flash */}
               <div className={`border rounded-xl p-3.5 text-center transition-all duration-300 relative overflow-hidden ${
                 priceFlash === 'up' 
-                  ? 'bg-emerald-950/60 border-emerald-500/80 shadow-lg shadow-emerald-500/20' 
+                  ? 'bg-emerald-950/40 border-emerald-500/80 shadow-[0_0_20px_rgba(25,229,140,0.35)] ob-flash-up' 
                   : priceFlash === 'down' 
-                    ? 'bg-rose-950/60 border-rose-500/80 shadow-lg shadow-rose-500/20' 
-                    : 'bg-slate-950/60 border-slate-800/80'
+                    ? 'bg-rose-950/40 border-rose-500/80 shadow-[0_0_20px_rgba(255,77,103,0.35)] ob-flash-down' 
+                    : 'bg-[#0b1017] border-slate-800/80'
               }`}>
                 <div className="flex items-center justify-center gap-1.5 mb-1">
                   <span className="text-xs font-mono text-slate-400">Live LTP</span>
                   {isMarketOpen && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 ob-sonar-dot"></span>
                       1s LIVE
                     </span>
                   )}
                 </div>
-                <div className={`text-2xl font-extrabold font-mono transition-transform duration-150 ${
+                <div className={`text-2xl font-black font-mono transition-transform duration-200 ${
                   priceFlash === 'up' 
                     ? 'text-emerald-300 scale-105' 
                     : priceFlash === 'down' 
                       ? 'text-rose-300 scale-105' 
-                      : (isPriceUp ? 'text-emerald-400' : 'text-rose-400')
+                      : (isPriceUp ? 'text-[#19E58C] drop-shadow-[0_0_8px_rgba(25,229,140,0.3)]' : 'text-[#FF4D67] drop-shadow-[0_0_8px_rgba(255,77,103,0.3)]')
                 }`}>
                   ₹{quote ? quote.ltp.toFixed(2) : '--.--'}
                 </div>
-                <div className={`text-xs font-mono mt-0.5 ${isPriceUp ? 'text-emerald-400' : 'text-rose-400'}`}>
+                <div className={`text-xs font-mono font-bold mt-0.5 ${isPriceUp ? 'text-emerald-400' : 'text-rose-400'}`}>
                   {quote ? `${isPriceUp ? '+' : ''}${quote.change.toFixed(2)} (${isPriceUp ? '+' : ''}${quote.changePercent.toFixed(2)}%)` : ''}
                 </div>
                 {lastTickTime && (
-                  <div className="text-[10px] font-mono text-slate-400 mt-1">
+                  <div className="text-[10px] font-mono text-slate-500 mt-1">
                     Tick: {lastTickTime}
                   </div>
                 )}
               </div>
 
               {/* Position */}
-              <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5 text-center">
+              <div className="bg-[#0b1017] border border-slate-800/80 rounded-xl p-3.5 text-center group hover:border-slate-700 transition-colors">
                 <span className="text-xs font-mono text-slate-400 block mb-1">Active Position</span>
-                <div className="text-2xl font-extrabold font-mono text-white">
+                <div className="text-2xl font-black font-mono text-white">
                   {position ? position.quantity : 0} <span className="text-xs text-slate-400 font-normal">Shares</span>
                 </div>
                 <div className="text-xs font-mono text-slate-400 mt-0.5">
@@ -577,9 +580,9 @@ export const App: React.FC = () => {
               </div>
 
               {/* Unrealized PnL */}
-              <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5 text-center">
+              <div className="bg-[#0b1017] border border-slate-800/80 rounded-xl p-3.5 text-center group hover:border-slate-700 transition-colors">
                 <span className="text-xs font-mono text-slate-400 block mb-1">Unrealized P&L</span>
-                <div className={`text-2xl font-extrabold font-mono ${(position?.unrealizedPnL || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                <div className={`text-2xl font-black font-mono ${(position?.unrealizedPnL || 0) >= 0 ? 'text-[#19E58C] drop-shadow-[0_0_8px_rgba(25,229,140,0.25)]' : 'text-[#FF4D67] drop-shadow-[0_0_8px_rgba(255,77,103,0.25)]'}`}>
                   ₹{position ? position.unrealizedPnL.toFixed(2) : '0.00'}
                 </div>
                 <div className="text-xs font-mono text-slate-400 mt-0.5">
@@ -588,17 +591,17 @@ export const App: React.FC = () => {
               </div>
 
               {/* Strategy Recommendation */}
-              <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5 text-center">
+              <div className="bg-[#0b1017] border border-slate-800/80 rounded-xl p-3.5 text-center group hover:border-slate-700 transition-colors">
                 <span className="text-xs font-mono text-slate-400 block mb-1">
                   {activeStrategyInfo?.activeStrategyType === 'CUSTOM' ? 'Custom Conviction' : 'Strategy Conviction'}
                 </span>
                 {activeStrategyInfo?.activeStrategyType === 'CUSTOM' ? (
                   <>
-                    <div className={`text-2xl font-extrabold font-mono ${
+                    <div className={`text-2xl font-black font-mono ${
                       customStrategyEvaluation?.signal === 'BUY' 
-                        ? 'text-emerald-400' 
+                        ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(25,229,140,0.3)]' 
                         : customStrategyEvaluation?.signal === 'SELL' 
-                          ? 'text-rose-400' 
+                          ? 'text-rose-400 drop-shadow-[0_0_8px_rgba(255,77,103,0.3)]' 
                           : 'text-amber-400'
                     }`}>
                       {customStrategyEvaluation ? customStrategyEvaluation.signal : 'CALCULATING...'}
@@ -611,7 +614,7 @@ export const App: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <div className="text-2xl font-extrabold font-mono text-indigo-400">
+                    <div className="text-2xl font-black font-mono text-cyan-400 drop-shadow-[0_0_8px_rgba(69,184,255,0.3)]">
                       {strategyScore ? `${strategyScore.score > 0 ? '+' : ''}${strategyScore.score}` : '--'}
                     </div>
                     <div className="text-xs font-mono text-slate-300 font-semibold mt-0.5">
@@ -635,13 +638,13 @@ export const App: React.FC = () => {
               />
 
               {/* Quick Order Terminal */}
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
-                <h3 className="text-base font-bold text-white mb-3 flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-emerald-400" />
-                  <span>Manual Order Execution</span>
+              <div className="ob-panel rounded-2xl p-5 shadow-2xl border border-slate-800 relative overflow-hidden">
+                <h3 className="text-base font-bold text-white mb-3.5 flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-cyan-400" />
+                  <span className="tracking-wide">Manual Order Execution Terminal</span>
                 </h3>
 
-                <div className="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-xl p-3 mb-4">
+                <div className="flex items-center justify-between bg-[#0b1017] border border-slate-800/80 rounded-xl p-3 mb-4">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-mono text-slate-300 font-semibold">Order Quantity:</span>
                     {liveFunds && liveFunds.availableMargin > 0 && quote && quote.ltp > 0 && (
@@ -655,7 +658,7 @@ export const App: React.FC = () => {
                           const capped = botConfig?.maxQuantity ? Math.min(affordQty, botConfig.maxQuantity) : affordQty;
                           setQuantity(capped);
                         }}
-                        className="text-[10px] font-mono px-2 py-0.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded transition-colors"
+                        className="text-[10px] font-mono px-2.5 py-0.5 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-full transition-all active:scale-95"
                         title={`Max affordable shares based on ₹${liveFunds.availableMargin.toFixed(0)} margin`}
                       >
                         Max Afford (₹{liveFunds.availableMargin.toFixed(0)})
@@ -666,7 +669,7 @@ export const App: React.FC = () => {
                     <button 
                       type="button" 
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold transition-colors text-sm"
+                      className="w-8 h-8 rounded-lg bg-slate-850 hover:bg-slate-750 text-white font-bold transition-all text-sm border border-slate-700/80 active:scale-95 flex items-center justify-center"
                     >
                       -
                     </button>
@@ -675,12 +678,12 @@ export const App: React.FC = () => {
                       min="1" 
                       value={quantity} 
                       onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="w-16 bg-slate-900 border border-slate-700 rounded-lg text-center font-mono text-white py-1 text-sm font-bold focus:outline-none focus:border-indigo-500"
+                      className="w-16 bg-[#090d16] border border-slate-700 rounded-lg text-center font-mono text-white py-1 text-sm font-bold focus:outline-none focus:border-cyan-500"
                     />
                     <button 
                       type="button" 
                       onClick={() => setQuantity(quantity + 1)}
-                      className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold transition-colors text-sm"
+                      className="w-8 h-8 rounded-lg bg-slate-850 hover:bg-slate-750 text-white font-bold transition-all text-sm border border-slate-700/80 active:scale-95 flex items-center justify-center"
                     >
                       +
                     </button>
@@ -688,41 +691,47 @@ export const App: React.FC = () => {
                 </div>
 
                 {lastOrder && (
-                  <div className="bg-slate-950/60 border border-slate-800 rounded-lg p-2.5 mb-3 flex items-center justify-between text-xs font-mono">
+                  <div className="bg-[#0b1017] border border-slate-800/80 rounded-xl p-3 mb-3.5 flex items-center justify-between text-xs font-mono">
                     <span className="text-slate-400">Last Execution:</span>
-                    <span className={`font-bold ${lastOrder.transactionType === 'BUY' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    <span className={`font-bold flex items-center gap-1.5 ${lastOrder.transactionType === 'BUY' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${lastOrder.transactionType === 'BUY' ? 'bg-emerald-400' : 'bg-rose-400'} ob-sonar-dot`} />
                       {lastOrder.transactionType} {lastOrder.quantity} @ ₹{lastOrder.executionPrice?.toFixed(2) || '--'} ({lastOrder.statusText})
                     </span>
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3.5">
                   <button 
                     type="button" 
                     onClick={() => handleOpenOrderModal('BUY')}
-                    className="py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-mono font-bold text-sm transition-all shadow-lg shadow-emerald-950/40"
+                    className="py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl font-mono font-black text-sm tracking-wider transition-all duration-300 shadow-[0_0_20px_rgba(25,229,140,0.25)] hover:shadow-[0_0_25px_rgba(25,229,140,0.4)] active:scale-95 ob-glow-bull flex items-center justify-center gap-2"
                   >
-                    BUY IDEA (MARKET)
+                    <span>BUY IDEA (MARKET)</span>
                   </button>
                   <button 
                     type="button" 
                     onClick={() => handleOpenOrderModal('SELL')}
-                    className="py-3 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-mono font-bold text-sm transition-all shadow-lg shadow-rose-950/40"
+                    className="py-3 px-4 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white rounded-xl font-mono font-black text-sm tracking-wider transition-all duration-300 shadow-[0_0_20px_rgba(255,77,103,0.25)] hover:shadow-[0_0_25px_rgba(255,77,103,0.4)] active:scale-95 ob-glow-bear flex items-center justify-center gap-2"
                   >
-                    SELL IDEA (MARKET)
+                    <span>SELL IDEA (MARKET)</span>
                   </button>
                 </div>
 
-                <div className="text-center mt-2.5 text-[11px] font-mono text-slate-500">
+                <div className="text-center mt-3 text-[11px] font-mono text-slate-500">
                   Product: Delivery (D) &bull; Order Type: MARKET &bull; Exchange: NSE
                 </div>
               </div>
 
               {/* Recent Executed Orders Audit Log */}
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
-                <h3 className="text-base font-bold text-white mb-3">Recent Executions</h3>
+              <div className="ob-panel rounded-2xl p-5 shadow-2xl border border-slate-800 relative overflow-hidden">
+                <div className="flex items-center justify-between mb-3.5">
+                  <h3 className="text-base font-bold text-white tracking-wide">Recent Executions Telemetry</h3>
+                  <span className="text-[10px] font-mono text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60">
+                    Live Session
+                  </span>
+                </div>
                 {recentOrders.length === 0 ? (
-                  <div className="text-xs font-mono text-slate-500 py-6 text-center">
+                  <div className="text-xs font-mono text-slate-500 py-8 text-center bg-[#0b1017] rounded-xl border border-slate-850">
                     No orders executed yet in this session.
                   </div>
                 ) : (
@@ -730,26 +739,33 @@ export const App: React.FC = () => {
                     <table className="w-full text-left font-mono text-xs">
                       <thead>
                         <tr className="border-b border-slate-800 text-slate-500 text-[11px]">
-                          <th className="pb-2">TIME</th>
-                          <th className="pb-2">TYPE</th>
-                          <th className="pb-2">QTY</th>
-                          <th className="pb-2">STATUS</th>
-                          <th className="pb-2">PRICE</th>
-                          <th className="pb-2">ORDER ID</th>
+                          <th className="pb-2.5">TIME</th>
+                          <th className="pb-2.5">TYPE</th>
+                          <th className="pb-2.5">QTY</th>
+                          <th className="pb-2.5">STATUS</th>
+                          <th className="pb-2.5">PRICE</th>
+                          <th className="pb-2.5">ORDER ID</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800/60">
                         {recentOrders.map((ord, idx) => (
-                          <tr key={idx} className="hover:bg-slate-800/30">
+                          <tr key={idx} className="hover:bg-slate-800/40 transition-colors ob-animate-rise">
                             <td className="py-2.5 text-slate-400">
                               {ord.executionTimeUtc ? new Date(ord.executionTimeUtc).toLocaleTimeString() : '-'}
                             </td>
                             <td className={`py-2.5 font-bold ${ord.transactionType === 'BUY' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                              {ord.transactionType}
+                              <span className="flex items-center gap-1.5">
+                                <span className={`w-1.5 h-1.5 rounded-full ${ord.transactionType === 'BUY' ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+                                {ord.transactionType}
+                              </span>
                             </td>
-                            <td className="py-2.5 text-white">{ord.quantity}</td>
-                            <td className="py-2.5 text-slate-300">{ord.statusText}</td>
-                            <td className="py-2.5 text-white">
+                            <td className="py-2.5 text-white font-bold">{ord.quantity}</td>
+                            <td className="py-2.5 text-slate-300">
+                              <span className="px-2 py-0.5 bg-slate-800/80 rounded border border-slate-700/60 text-[10px]">
+                                {ord.statusText}
+                              </span>
+                            </td>
+                            <td className="py-2.5 text-white font-bold">
                               {ord.executionPrice ? `₹${ord.executionPrice.toFixed(2)}` : '-'}
                             </td>
                             <td className="py-2.5 text-slate-500">

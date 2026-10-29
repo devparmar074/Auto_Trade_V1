@@ -20,11 +20,46 @@ export const StrategyScoreCard: React.FC<StrategyScoreCardProps> = ({ score }) =
 
   // Determine recommendation badge color and styling
   const getScoreColor = (val: number) => {
-    if (val >= 60) return { text: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', fill: 'bg-emerald-500' };
-    if (val >= 20) return { text: 'text-green-400', bg: 'bg-green-500/10', border: 'border-green-500/30', fill: 'bg-green-500' };
-    if (val <= -60) return { text: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/30', fill: 'bg-red-500' };
-    if (val <= -20) return { text: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/30', fill: 'bg-rose-500' };
-    return { text: 'text-slate-300', bg: 'bg-slate-800', border: 'border-slate-700', fill: 'bg-slate-500' };
+    if (val >= 60) return { 
+      text: 'text-[#19E58C]', 
+      bg: 'bg-[#19E58C]/15', 
+      border: 'border-[#19E58C]/40', 
+      fill: 'ob-glint-bar',
+      glow: 'ob-glow-bull',
+      badgeDot: 'ob-sonar-dot'
+    };
+    if (val >= 20) return { 
+      text: 'text-[#2DD4BF]', 
+      bg: 'bg-[#2DD4BF]/15', 
+      border: 'border-[#2DD4BF]/40', 
+      fill: 'bg-[#2DD4BF]',
+      glow: 'shadow-[0_0_20px_rgba(45,212,191,0.2)]',
+      badgeDot: 'w-2 h-2 rounded-full bg-[#2DD4BF]'
+    };
+    if (val <= -60) return { 
+      text: 'text-[#FF4D67]', 
+      bg: 'bg-[#FF4D67]/15', 
+      border: 'border-[#FF4D67]/40', 
+      fill: 'ob-glint-bar-bear',
+      glow: 'ob-glow-bear',
+      badgeDot: 'ob-sonar-dot-bear'
+    };
+    if (val <= -20) return { 
+      text: 'text-[#F472B6]', 
+      bg: 'bg-[#F472B6]/15', 
+      border: 'border-[#F472B6]/40', 
+      fill: 'bg-[#F472B6]',
+      glow: 'shadow-[0_0_20px_rgba(244,114,182,0.2)]',
+      badgeDot: 'w-2 h-2 rounded-full bg-[#F472B6]'
+    };
+    return { 
+      text: 'text-slate-300', 
+      bg: 'bg-[#161C27]', 
+      border: 'border-[#242D3C]', 
+      fill: 'bg-slate-500',
+      glow: 'border-[#1A212D]',
+      badgeDot: 'w-2 h-2 rounded-full bg-slate-500'
+    };
   };
 
   const rawScore = score.score ?? 0;
@@ -35,32 +70,33 @@ export const StrategyScoreCard: React.FC<StrategyScoreCardProps> = ({ score }) =
   const gaugePercent = Math.max(0, Math.min(100, (rawScore + 100) / 2));
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col justify-between">
+    <div className={`ob-panel rounded-2xl p-5 shadow-2xl flex flex-col justify-between transition-all duration-300 ${colors.glow}`}>
       {/* Header */}
       <div>
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-indigo-500/10 text-indigo-400 rounded-lg">
+        <div className="flex items-center justify-between pb-3 border-b border-[#1A212D]">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-[#7B7BFF]/15 text-[#7B7BFF] rounded-xl border border-[#7B7BFF]/25 shadow-[0_0_12px_rgba(123,123,255,0.2)]">
               <Zap className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-white text-base">Strategy & Scoring Engine</h3>
+              <h3 className="font-extrabold text-white text-base tracking-tight">Strategy & Scoring Engine</h3>
               <p className="text-xs text-slate-400 font-mono">Algorithmic Multi-Factor Model</p>
             </div>
           </div>
 
-          <div className={`px-3 py-1 rounded-full text-xs font-bold border font-mono tracking-wide ${colors.bg} ${colors.text} ${colors.border}`}>
-            {score.recommendationText || 'NEUTRAL'}
+          <div className={`px-3.5 py-1 rounded-full text-xs font-bold border font-mono tracking-wider flex items-center gap-2 ${colors.bg} ${colors.text} ${colors.border}`}>
+            <span className={colors.badgeDot}></span>
+            <span>{score.recommendationText || 'NEUTRAL'}</span>
           </div>
         </div>
 
-        {/* Score Gauge &Conviction */}
-        <div className="my-5 bg-slate-950/60 border border-slate-800/80 rounded-xl p-4">
-          <div className="flex items-end justify-between mb-2">
+        {/* Score Gauge & Conviction */}
+        <div className="my-5 bg-[#11161F] border border-[#1A212D] rounded-2xl p-4 shadow-inner relative overflow-hidden">
+          <div className="flex items-end justify-between mb-2.5">
             <div>
-              <span className="text-xs text-slate-400 font-mono block">Composite Conviction Score</span>
-              <div className="flex items-baseline gap-2">
-                <span className={`text-3xl font-extrabold font-mono ${colors.text}`}>
+              <span className="text-[11px] text-slate-400 font-mono uppercase tracking-wider block">Composite Conviction Score</span>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <span className={`text-4xl font-black font-mono tracking-tight ${colors.text}`}>
                   {rawScore > 0 ? `+${rawScore}` : rawScore}
                 </span>
                 <span className="text-xs text-slate-500 font-mono">/ ±100</span>
@@ -68,79 +104,79 @@ export const StrategyScoreCard: React.FC<StrategyScoreCardProps> = ({ score }) =
             </div>
 
             <div className="text-right">
-              <span className="text-xs text-slate-400 font-mono block">Recommended Sizing</span>
-              <span className="text-lg font-bold font-mono text-emerald-400">
+              <span className="text-[11px] text-slate-400 font-mono uppercase tracking-wider block">Recommended Sizing</span>
+              <span className="text-xl font-black font-mono text-[#19E58C]">
                 {score.recommendedQuantity ?? 1} {(score.recommendedQuantity ?? 1) === 1 ? 'Share' : 'Shares'}
               </span>
             </div>
           </div>
 
-          {/* Progress bar */}
-          <div className="relative w-full h-3 bg-slate-800 rounded-full overflow-hidden">
+          {/* Glint Shimmer Progress Bar */}
+          <div className="relative w-full h-3.5 bg-[#06080C] rounded-full overflow-hidden border border-[#1A212D]">
             {/* Center mark for 0 */}
-            <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-600 z-10"></div>
+            <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-500 z-10 opacity-70"></div>
             <div 
-              className={`h-full transition-all duration-500 rounded-full ${colors.fill}`}
+              className={`h-full transition-all duration-700 ease-out rounded-full ${colors.fill}`}
               style={{ width: `${gaugePercent}%` }}
             />
           </div>
-          <div className="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
-            <span>-100 (Strong Sell)</span>
+          <div className="flex justify-between text-[10px] font-mono text-slate-500 mt-1.5 font-semibold">
+            <span className="text-[#FF4D67]">-100 (Strong Sell)</span>
             <span>0 (Neutral)</span>
-            <span>+100 (Strong Buy)</span>
+            <span className="text-[#19E58C]">+100 (Strong Buy)</span>
           </div>
         </div>
 
         {/* Technical Indicators Matrix */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
           {/* RSI */}
-          <div className="bg-slate-800/60 border border-slate-700/60 rounded-lg p-2.5">
+          <div className="bg-[#11161F] border border-[#1A212D] hover:border-[#45B8FF]/40 rounded-xl p-2.5 ob-hover-lift">
             <div className="text-[11px] text-slate-400 font-mono flex items-center justify-between">
               <span>RSI (14)</span>
-              <span className={`text-[10px] font-bold ${ind?.rsi != null && ind.rsi > 70 ? 'text-red-400' : ind?.rsi != null && ind.rsi < 30 ? 'text-emerald-400' : 'text-slate-400'}`}>
+              <span className={`text-[10px] font-bold ${ind?.rsi != null && ind.rsi > 70 ? 'text-[#FF4D67]' : ind?.rsi != null && ind.rsi < 30 ? 'text-[#19E58C]' : 'text-slate-400'}`}>
                 {ind?.rsi != null ? (ind.rsi > 70 ? 'OVERBOUGHT' : ind.rsi < 30 ? 'OVERSOLD' : 'NORMAL') : '--'}
               </span>
             </div>
-            <div className="text-base font-bold font-mono text-white mt-1">
+            <div className="text-base font-black font-mono text-white mt-1">
               {ind?.rsi != null ? ind.rsi.toFixed(1) : '--.-'}
             </div>
           </div>
 
           {/* EMA 9 / 21 */}
-          <div className="bg-slate-800/60 border border-slate-700/60 rounded-lg p-2.5">
+          <div className="bg-[#11161F] border border-[#1A212D] hover:border-[#19E58C]/40 rounded-xl p-2.5 ob-hover-lift">
             <div className="text-[11px] text-slate-400 font-mono flex items-center justify-between">
               <span>EMA 9 / 21</span>
-              <span className={`text-[10px] font-bold ${ind?.ema9 != null && ind?.ema21 != null && ind.ema9 >= ind.ema21 ? 'text-emerald-400' : 'text-red-400'}`}>
-                {ind?.ema9 != null && ind?.ema21 != null ? (ind.ema9 >= ind.ema21 ? 'BULL' : 'BEAR') : '--'}
+              <span className={`text-[10px] font-bold ${ind?.ema9 != null && ind?.ema21 != null && ind.ema9 >= ind.ema21 ? 'text-[#19E58C]' : 'text-[#FF4D67]'}`}>
+                {ind?.ema9 != null && ind?.ema21 != null ? (ind.ema9 >= ind.ema21 ? 'BULLISH' : 'BEARISH') : '--'}
               </span>
             </div>
-            <div className="text-base font-bold font-mono text-white mt-1">
+            <div className="text-base font-black font-mono text-white mt-1">
               {ind?.ema9 != null ? `₹${ind.ema9.toFixed(2)}` : '--'} / <span className="text-slate-400">{ind?.ema21 != null ? `₹${ind.ema21.toFixed(2)}` : '--'}</span>
             </div>
           </div>
 
           {/* VWAP */}
-          <div className="bg-slate-800/60 border border-slate-700/60 rounded-lg p-2.5">
+          <div className="bg-[#11161F] border border-[#1A212D] hover:border-[#FFB020]/40 rounded-xl p-2.5 ob-hover-lift">
             <div className="text-[11px] text-slate-400 font-mono flex items-center justify-between">
               <span>VWAP</span>
-              <span className={`text-[10px] font-bold ${ind?.vwap != null && (score.currentPrice ?? 0) >= ind.vwap ? 'text-emerald-400' : 'text-red-400'}`}>
+              <span className={`text-[10px] font-bold ${ind?.vwap != null && (score.currentPrice ?? 0) >= ind.vwap ? 'text-[#19E58C]' : 'text-[#FF4D67]'}`}>
                 {ind?.vwap != null ? ((score.currentPrice ?? 0) >= ind.vwap ? 'ABOVE' : 'BELOW') : '--'}
               </span>
             </div>
-            <div className="text-base font-bold font-mono text-white mt-1">
+            <div className="text-base font-black font-mono text-white mt-1">
               {ind?.vwap != null ? `₹${ind.vwap.toFixed(2)}` : '--'}
             </div>
           </div>
 
           {/* Supertrend */}
-          <div className="bg-slate-800/60 border border-slate-700/60 rounded-lg p-2.5">
+          <div className="bg-[#11161F] border border-[#1A212D] hover:border-[#2DD4BF]/40 rounded-xl p-2.5 ob-hover-lift">
             <div className="text-[11px] text-slate-400 font-mono flex items-center justify-between">
-              <span>Supertrend (10,3)</span>
-              <span className={`text-[10px] font-bold ${ind?.supertrendDirection === 'BULLISH' ? 'text-emerald-400' : ind?.supertrendDirection === 'BEARISH' ? 'text-red-400' : 'text-slate-400'}`}>
+              <span>Supertrend</span>
+              <span className={`text-[10px] font-bold ${ind?.supertrendDirection === 'BULLISH' ? 'text-[#19E58C]' : ind?.supertrendDirection === 'BEARISH' ? 'text-[#FF4D67]' : 'text-slate-400'}`}>
                 {ind?.supertrendDirection || '--'}
               </span>
             </div>
-            <div className="text-base font-bold font-mono text-white mt-1">
+            <div className="text-base font-black font-mono text-white mt-1">
               {ind?.supertrend != null ? `₹${ind.supertrend.toFixed(2)}` : '--'}
             </div>
           </div>
